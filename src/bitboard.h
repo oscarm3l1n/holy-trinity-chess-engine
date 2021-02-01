@@ -3,7 +3,6 @@
 #include <iostream>
 #include "enum.h"
 
-#define u64 unsigned long long
 
 #define set_bit(bitboard, square) ((bitboard) |= (1ULL << square))
 #define get_bit(bitboard, square) (((bitboard) >> (square)) & 1ULL)
@@ -11,7 +10,6 @@
 
 
 void print_bitboard(u64 bitboard){
-    printf("\n\n");
     for (int rank = 0; rank < 8; ++rank){
         for (int file = 0; file < 8; ++file){
             int square = 8 * rank + file;
@@ -22,6 +20,23 @@ void print_bitboard(u64 bitboard){
         std::cout << std::endl;
     }
     std::cout << "\n   a b c d e f g h\n\n";
+}
+
+int count_bits(u64 bitboard){
+    int counter = 0;
+    while (bitboard){
+        bitboard &= bitboard - 1;
+        counter++;
+    }
+    return counter;
+}
+
+int get_index(u64 bitboard){
+    if (bitboard){
+        return count_bits((bitboard & -bitboard) - 1);
+    } else {
+        return -1;
+    }
 }
 
 /*
