@@ -3,11 +3,9 @@
 #include <iostream>
 #include "enum.h"
 
-
-#define set_bit(bitboard, square) ((bitboard) |= (1ULL << square))
+#define set_bit(bitboard, square) ((bitboard) |= (1ULL << (square)))
 #define get_bit(bitboard, square) (((bitboard) >> (square)) & 1ULL)
 #define clear_bit(bitboard, square) ((bitboard) &= ~(1ULL << square))
-
 
 void print_bitboard(u64 bitboard){
     for (int rank = 0; rank < 8; ++rank){
