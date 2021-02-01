@@ -8,7 +8,7 @@ void u64_print_without_file(){
     for(int rank = 0; rank < 8; ++rank){
         for(int file = 0; file < 8; ++file){
             int square = 8 * rank + file;
-            if (file < 7)
+            if (file > 1)
                 set_bit(temp_bb, square);
         }
     }
@@ -21,10 +21,11 @@ int main(){
     u64 temp = 0ULL;
     for(int sq = 0; sq < 64; ++sq){
         std::cout << "square: " << squareToCoord[sq] << std::endl;
-        temp = generate_pawn_attack_mask(true, sq);
+        temp = generate_knight_attacks( sq);
         print_bitboard(temp);
         getchar();
     }
+
     // u64_print_without_file();
 
     return 0;
