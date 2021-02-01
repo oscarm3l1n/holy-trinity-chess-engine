@@ -1,6 +1,80 @@
 #include "bitboard.h"
 
+u64 rayNorth[64] = {
+    0ULL,
+    0ULL,
+    0ULL,
+    0ULL,
+    0ULL,
+    0ULL,
+    0ULL,
+    0ULL,
+    1ULL,
+    2ULL,
+    4ULL,
+    8ULL,
+    16ULL,
+    32ULL,
+    64ULL,
+    128ULL,
+    257ULL,
+    514ULL,
+    1028ULL,
+    2056ULL,
+    4112ULL,
+    8224ULL,
+    16448ULL,
+    32896ULL,
+    65793ULL,
+    131586ULL,
+    263172ULL,
+    526344ULL,
+    1052688ULL,
+    2105376ULL,
+    4210752ULL,
+    8421504ULL,
+    16843009ULL,
+    33686018ULL,
+    67372036ULL,
+    134744072ULL,
+    269488144ULL,
+    538976288ULL,
+    1077952576ULL,
+    2155905152ULL,
+    4311810305ULL,
+    8623620610ULL,
+    17247241220ULL,
+    34494482440ULL,
+    68988964880ULL,
+    137977929760ULL,
+    275955859520ULL,
+    551911719040ULL,
+    1103823438081ULL,
+    2207646876162ULL,
+    4415293752324ULL,
+    8830587504648ULL,
+    17661175009296ULL,
+    35322350018592ULL,
+    70644700037184ULL,
+    141289400074368ULL,
+    282578800148737ULL,
+    565157600297474ULL,
+    1130315200594948ULL,
+    2260630401189896ULL,
+    4521260802379792ULL,
+    9042521604759584ULL,
+    18085043209519168ULL,
+    36170086419038336ULL
+};
+u64 raySouth[64] = {
 
+};
+u64 rayWest[64] = {
+
+};
+u64 rayEast[64] = {
+
+};
 
 // leaper pieces
 u64 pawnAttacks[2][64]; // not the same for black and white
@@ -77,7 +151,7 @@ u64 generate_king_attacks(int square){
 
 // slider pieces
 u64 generate_bishop_attacks(int square){
-    
+    return 0ULL;
 }
 
 void init_leaper_attacks(){
