@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 
 #define u64 unsigned long long
@@ -30,3 +32,26 @@ void print_bitboard(u64 bitboard){
     }
     std::cout << "\n   a b c d e f g h\n\n";
 }
+
+/*
+    0 0 0 0 0 0 1 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+*/
+
+/*
+    1 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0
+*/
+
