@@ -2,14 +2,14 @@
 #include "bitboard.h"
 
 int main(){
+
+    #ifdef WIN64
+        std::cout << "Aeee..." << std::endl;
+    #else
+        std::cout << "Tjena kexet" << std::endl;
+    #endif
+
     u64 bitboard = 0ULL;
-
-    set_bit(bitboard, c8);
-    print_bitboard(bitboard);
-
-    std::cout << "Remove" << std::endl;
-    clear_bit(bitboard, c8);
-    print_bitboard(bitboard);
 
     printf("Bitboard: %lld\n", bitboard);
     return 0;
