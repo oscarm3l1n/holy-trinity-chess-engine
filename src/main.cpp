@@ -21,7 +21,7 @@ int main(){
     u64 temp = 0ULL;
     for(int sq = 0; sq < 64; ++sq){
         std::cout << "square: " << squareToCoord[sq] << std::endl;
-        temp = generate_pawn_attacks(black, sq);
+        temp = generate_king_attacks(sq);
         print_bitboard(temp);
         getchar();
     }

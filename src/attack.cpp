@@ -55,8 +55,24 @@ u64 generate_knight_attacks(int square){
 }
 
 u64 generate_king_attacks(int square){
+    // helps with not shifting the bit into the wrong squares
+    const u64 withoutAfile = 18374403900871474942ULL;
+    const u64 withoutHfile = 9187201950435737471ULL;
+    
     u64 attacks = 0ULL;
+    u64 tempBitboard = 0ULL;
+    set_bit(tempBitboard, square);
+    if ((tempBitboard >> 1) & withoutHfile)       attacks |= (tempBitboard >> 1);
+    if ((tempBitboard >> 7) & withoutAfile)          attacks |= (tempBitboard >> 7);
+    if ((tempBitboard >> 8))                            attacks |= (tempBitboard >> 8);
+    if ((tempBitboard >> 9) & withoutHfile)       attacks |= (tempBitboard >> 9);
 
+    if ((tempBitboard << 1) & withoutAfile)       attacks |= (tempBitboard << 1);
+    if ((tempBitboard << 7) & withoutHfile)       attacks |= (tempBitboard << 7);
+    if ((tempBitboard << 8))       attacks |= (tempBitboard << 8);
+    if ((tempBitboard << 9) & withoutAfile)       attacks |= (tempBitboard << 9);
+
+    
     return attacks;
 }
 
