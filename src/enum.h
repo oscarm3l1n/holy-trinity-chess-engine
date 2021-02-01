@@ -32,10 +32,19 @@ std::string squareToCoord[64] = {
 
 // pieces
 enum {P,B,N,Q,K,p,b,n,q,k};
+
 // colours
 enum {black, white, both};
+
+// castling rights
+enum {wk = 1, wq = 2, bk = 4, bq = 8};
+
+int enPassant; // Should be noSquare as default
+
 int side; // black or white
+
 std::string pieces = "PBNQKpbnqk";
+
 
 
 u64 bitboards[12];  // for all pieces

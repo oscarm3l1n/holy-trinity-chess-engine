@@ -41,13 +41,13 @@ u64 generate_knight_attacks(int square){
     u64 attacks = 0ULL;
     u64 tempBitboard = 0ULL;
     set_bit(tempBitboard, square);
-    if ((tempBitboard >> 17) & withoutHfile)    attacks |= (tempBitboard >> 17);
-    if ((tempBitboard >> 15) & withoutAfile)    attacks |= (tempBitboard >> 15);
+    if ((tempBitboard >> 17) & withoutHfile)     attacks |= (tempBitboard >> 17);
+    if ((tempBitboard >> 15) & withoutAfile)     attacks |= (tempBitboard >> 15);
     if ((tempBitboard >> 10) & withoutGHfile)    attacks |= (tempBitboard >> 10);
     if ((tempBitboard >> 6) & withoutABfile)     attacks |= (tempBitboard >> 6);
 
-    if ((tempBitboard << 17) & withoutAfile)    attacks |= (tempBitboard << 17);
-    if ((tempBitboard << 15) & withoutHfile)    attacks |= (tempBitboard << 15);
+    if ((tempBitboard << 17) & withoutAfile)     attacks |= (tempBitboard << 17);
+    if ((tempBitboard << 15) & withoutHfile)     attacks |= (tempBitboard << 15);
     if ((tempBitboard << 10) & withoutABfile)    attacks |= (tempBitboard << 10);
     if ((tempBitboard << 6) & withoutGHfile)     attacks |= (tempBitboard << 6);
 
@@ -56,8 +56,13 @@ u64 generate_knight_attacks(int square){
 
 u64 generate_king_attacks(int square){
     u64 attacks = 0ULL;
-    
+
     return attacks;
+}
+
+// slider pieces
+u64 generate_bishop_attacks(int square){
+    
 }
 
 void init_leaper_attacks(){
