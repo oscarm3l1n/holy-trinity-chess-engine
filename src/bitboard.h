@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "enum.h"
+
 #define u64 unsigned long long
 
 #define set_bit(bitboard, square) ((bitboard) |= (1ULL << square))
