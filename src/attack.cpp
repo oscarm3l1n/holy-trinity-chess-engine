@@ -72,7 +72,6 @@ u64 generate_king_attacks(int square){
     if ((tempBitboard << 8))                      attacks |= (tempBitboard << 8);
     if ((tempBitboard << 9) & withoutAfile)       attacks |= (tempBitboard << 9);
 
-    
     return attacks;
 }
 
