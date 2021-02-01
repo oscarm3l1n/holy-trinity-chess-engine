@@ -27,3 +27,16 @@ std::string squareToCoord[64] = {
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 };
+
+// Game variables
+
+// pieces
+enum {P,B,N,Q,K,p,b,n,q,k};
+// colours
+enum {black, white, both};
+int side; // black or white
+std::string pieces = "PBNQKpbnqk";
+
+
+u64 bitboards[12];  // for all pieces
+u64 occupancy[3];   // white, black, both
