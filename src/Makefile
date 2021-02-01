@@ -1,11 +1,11 @@
 compile:
-	g++ main.cpp -o compiled
+	g++ -Werror main.cpp -o compiled
 
 run:
-	g++ main.cpp -o compiled && ./compiled
+	g++ -Werror main.cpp -o compiled && ./compiled
 
 wrun:
-	g++ main.cpp -o compiled && compiled.exe	
+	g++ -Werror main.cpp -o compiled && compiled.exe	
 
 clear:
 	rm compiled
