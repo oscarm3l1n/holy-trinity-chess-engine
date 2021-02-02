@@ -37,22 +37,21 @@ void generate_rays(int square){
     std::cout << result << "ULL," << std::endl;
 }
 
+
+
 int main(){
     
     u64 temp = 0ULL;
-    // for(int sq = 0; sq < 64; ++sq){
-    //     std::cout << "square: " << squareToCoord[sq] << std::endl;
-    //     temp = generate_king_attacks(sq);
-    //     print_bitboard(temp);
-    //     getchar();
+
+    // for(int i = a8; i <= h1; ++i){
+    //     // std::cout << "sq: " << squareToCoord[i] << std::endl;
+    //     generate_rays(i);
     // }
-
-    // u64_print_without_file();
-
-    for(int i = a8; i <= h1; ++i){
-        // std::cout << "sq: " << squareToCoord[i] << std::endl;
-        generate_rays(i);
+    for (int i = 0; i < 64; ++i){
+        print_bitboard(get_rook_attacks(i));
+        getchar();
     }
+
 
     return 0;
 }
