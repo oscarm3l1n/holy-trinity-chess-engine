@@ -34,7 +34,7 @@ void generate_bish(){
 
 int main(){
     
-    generate_bish();
+    generate_bishop_attacks();
 
     return 0;
 }
