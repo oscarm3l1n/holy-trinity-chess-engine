@@ -14,7 +14,7 @@ enum {
     a4, b4, c4, d4, e4, f4, g4, h4,
     a3, b3, c3, d3, e3, f3, g3, h3,
     a2, b2, c2, d2, e2, f2, g2, h2,
-    a1, b1, c1, d1, e1, f1, g1, h1
+    a1, b1, c1, d1, e1, f1, g1, h1, noSquare
 };
 
 std::string squareToCoord[64] = {
@@ -32,6 +32,7 @@ std::string squareToCoord[64] = {
 
 // pieces
 enum {P,B,N,Q,K,p,b,n,q,k};
+std::string pieces = "PBNQKpbnqk";
 
 // colours
 enum {black, white, both};
@@ -40,11 +41,8 @@ enum {black, white, both};
 enum {wk = 1, wq = 2, bk = 4, bq = 8};
 
 int enPassant; // Should be noSquare as default
-
 int side; // black or white
-
-std::string pieces = "PBNQKpbnqk";
-
+int castlingRights;
 
 
 u64 bitboards[12];  // for all pieces

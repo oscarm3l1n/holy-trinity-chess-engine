@@ -1,81 +1,5 @@
 #include "bitboard.h"
 
-u64 rayNorth[64] = {
-    0ULL,
-    0ULL,
-    0ULL,
-    0ULL,
-    0ULL,
-    0ULL,
-    0ULL,
-    0ULL,
-    1ULL,
-    2ULL,
-    4ULL,
-    8ULL,
-    16ULL,
-    32ULL,
-    64ULL,
-    128ULL,
-    257ULL,
-    514ULL,
-    1028ULL,
-    2056ULL,
-    4112ULL,
-    8224ULL,
-    16448ULL,
-    32896ULL,
-    65793ULL,
-    131586ULL,
-    263172ULL,
-    526344ULL,
-    1052688ULL,
-    2105376ULL,
-    4210752ULL,
-    8421504ULL,
-    16843009ULL,
-    33686018ULL,
-    67372036ULL,
-    134744072ULL,
-    269488144ULL,
-    538976288ULL,
-    1077952576ULL,
-    2155905152ULL,
-    4311810305ULL,
-    8623620610ULL,
-    17247241220ULL,
-    34494482440ULL,
-    68988964880ULL,
-    137977929760ULL,
-    275955859520ULL,
-    551911719040ULL,
-    1103823438081ULL,
-    2207646876162ULL,
-    4415293752324ULL,
-    8830587504648ULL,
-    17661175009296ULL,
-    35322350018592ULL,
-    70644700037184ULL,
-    141289400074368ULL,
-    282578800148737ULL,
-    565157600297474ULL,
-    1130315200594948ULL,
-    2260630401189896ULL,
-    4521260802379792ULL,
-    9042521604759584ULL,
-    18085043209519168ULL,
-    36170086419038336ULL
-};
-u64 raySouth[64] = {
-
-};
-u64 rayWest[64] = {
-
-};
-u64 rayEast[64] = {
-
-};
-
 // leaper pieces
 u64 pawnAttacks[2][64]; // not the same for black and white
 u64 knightAttacks[64];
@@ -217,7 +141,22 @@ u64 generate_king_attacks(int square){
 }
 
 // slider pieces
-u64 generate_bishop_attacks(int square){
+u64 generate_bishop_attacks(){
+    u64 result = 0ULL;
+    set_bit(result, a8);
+    set_bit(result, b7);
+    set_bit(result, c6);
+    set_bit(result, d5);
+    set_bit(result, e4);
+    set_bit(result, f3);
+    set_bit(result, g2);
+    set_bit(result, h1);
+    print_bitboard(result);
+    for(int i = 0; i < 8; ++i){
+        result = (result << i);
+        print_bitboard(result);
+    }    
+
     return 0ULL;
 }
 
@@ -234,27 +173,27 @@ void generate_rook_attacks(){
     u64 f = 0xff0000000000;
     u64 g = 0xff000000000000;
     u64 h = 0xff00000000000000;
-    u64 file[8] = {a,b,c,d,e,f,g,h};
+    u64 ranks[8] = {a,b,c,d,e,f,g,h};
 
-    u64 aa = 0x0101010101010101;
-    u64 bb = 0x0202020202020202;
-    u64 cc = 0x0404040404040404;
-    u64 dd = 0x0808080808080808;
-    u64 ee = 0x1010101010101010;
-    u64 ff = 0x2020202020202020;
-    u64 gg = 0x4040404040404040;
-    u64 hh = 0x8080808080808080;
-    u64 rank[] = {aa,bb,cc,dd,ee,ff,gg,hh};
+    u64 aa = 0x0101010101010101; // file a
+    u64 bb = 0x0202020202020202; // file b
+    u64 cc = 0x0404040404040404; // file c
+    u64 dd = 0x0808080808080808; // file d
+    u64 ee = 0x1010101010101010; // file e
+    u64 ff = 0x2020202020202020; // file f
+    u64 gg = 0x4040404040404040; // file g
+    u64 hh = 0x8080808080808080; // file h
+    u64 files[] = {aa,bb,cc,dd,ee,ff,gg,hh};
 
     for(int i = 0; i < 8; ++i){
         for(int j = 0; j < 8; ++j){
             int square = 8*i+j;
-            // std::cout << "square: " << squareToCoord[square] << std::endl;
-            u64 result = file[i] | rank[j];
+            std::cout << "square: " << squareToCoord[square] << std::endl;
+            u64 result = ranks[i] | files[j];
             clear_bit(result, square);
-            // print_bitboard(result);
-            // getchar();
-            std::cout << result << "ULL," << std::endl;
+            print_bitboard(result);
+            getchar();
+            // std::cout << result << "ULL," << std::endl;
         }
     }
 }

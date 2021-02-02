@@ -37,6 +37,10 @@ int get_index(u64 bitboard){
     }
 }
 
+void print_board(){
+    
+}
+
 /*
     0 0 0 0 0 0 1 0
     0 0 0 0 0 0 0 0
