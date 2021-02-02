@@ -1,18 +1,13 @@
 #include <iostream>
 #include "bitboard.h"
 #include "attack.cpp"
+#include "uci.cpp"
 
-void generate_bish(){
-    u64 a = 0x0201000000000000;
-    u64 b = 0x0402010000000000;
-    u64 c = 0x0804020100000000;
-    u64 d = 0x
-    print_bitboard(a);
-}
+#define STARTFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 int main(){
-    
-    generate_bish();
-
+    parse_fen((char*)STARTFEN);
+    print_board();
+    print_bitboard(occupancy[both]);
     return 0;
 }
