@@ -1,6 +1,10 @@
 #include <iostream>
 #include "bitboard.h"
 #include "attack.cpp"
+#include "uci.cpp"
+
+
+#define STARTFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 void generate_bish(){
     u64 a = 0x0201000000000000;
@@ -32,9 +36,16 @@ void generate_bish(){
     u64 mm = 0x4080000000000000;
 }
 
+<<<<<<< HEAD
 int main(){
     
     generate_bishop_attacks();
+=======
+>>>>>>> f0c0378043e10e3504ad7e4d515adf2e40ca46e4
 
+int main(){
+    parse_fen((char*)STARTFEN);
+    print_board();
+    print_bitboard(occupancy[both]);
     return 0;
 }

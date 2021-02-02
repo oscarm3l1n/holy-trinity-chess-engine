@@ -38,28 +38,30 @@ int get_index(u64 bitboard){
 }
 
 void print_board(){
-    
+    for (int rank = 0; rank < 8; ++rank) {
+        for( int file = 0; file < 8; ++file) {
+            int square = 8 * rank + file;
+            int piece = noPiece;
+            if (!file)
+                std::cout << 8 - rank << " ";
+
+            for (int p = P; p <= k; p++) {
+                if ( get_bit(bitboards[p], square) ){
+                    piece = p;
+                }
+            }
+            std::cout << " " << ((piece == noPiece) ? '.' : asciiPieces[piece]);
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << "   a b c d e f g h" << std::endl;
+    std::cout << "\n";
+    std::cout << "side: " << ((side == white) ? "white" : "black") << std::endl;
+    std::cout << "enpass: " << ((enPassant != noSquare) ? squareToCoord[enPassant] : "no") << std::endl;
+    std::cout << "Castle: " << 
+                ((castlingRights & wk) ? 'K' : '-') <<
+                ((castlingRights & wq) ? 'Q' : '-') <<
+                ((castlingRights & bk) ? 'k' : '-') <<
+                ((castlingRights & bq) ? 'q' : '-') << std::endl;
+
 }
-
-/*
-    0 0 0 0 0 0 1 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-*/
-
-/*
-    1 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0
-*/
-
