@@ -14,5 +14,4 @@ void all_init(){
     castlingRights = 0;
     side = white;
 
-
 }
