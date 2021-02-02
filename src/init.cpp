@@ -13,5 +13,4 @@ void all_init(){
     enPassant = noSquare;
     castlingRights = 0;
     side = white;
-
 }
