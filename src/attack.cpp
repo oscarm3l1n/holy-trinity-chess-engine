@@ -151,8 +151,51 @@ u64 get_bishop_attacks(int square, int currentSide){
     return newAttacks;
 }
 
-u64 get_rook_attacks(int square){
-    return rookAttacks[square];
+u64 get_rook_attacks(int square, int currentSide){
+    u64 newAttacks = 0ULL;
+    int i = square - 1;
+    while (i >= 0){
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i -= 1;
+    }
+    i = square - 8;
+    while ( i >= 0) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i -= 8;
+    }
+    i = square + 8;
+    while ( i < 64) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i += 8;
+    }
+    i = square + 1;
+    while ( i < 64) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i += 1;
+    }
+    newAttacks &= ~(occupancy[currentSide]) | occupancy[!currentSide];
+    newAttacks &= rookAttacks[square];
+    return newAttacks;
 }
 
 void generate_rook_attacks(){
