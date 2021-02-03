@@ -160,6 +160,14 @@ void init_slider_attacks(){
 
 }
 
+// Lets say we want to see if square e4 is attacked.
+// check all different pieces on the attacking side
+// say attacking side is white. Then we just check the 
+// attackTable for every square from the black side.
+// If we find a white piece within these attacked squares
+// we know that "because we can attack him, he can attack us"
+// therefore square is attacked
+
 bool square_attacked(int side, int square) {
 
     if (side == white) {
