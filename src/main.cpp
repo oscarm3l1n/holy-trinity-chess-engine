@@ -2,6 +2,7 @@
 #include "bitboard.h"
 #include "attack.cpp"
 #include "uci.cpp"
+#include "init.cpp"
 
 #define STARTFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -52,14 +53,20 @@ void generate_bish(){
     }
 }
 
+
+
+
 int main(){
-    parse_fen((char*)STARTFEN);
-    // set_bit(bitboards[p], d5);
-    // set_bit(bitboards[P], e4);
-    clear_bit(bitboards[P], g2);
-    init_leaper_attacks();
+    init();
+
+    parse_fen( (char*) STARTFEN);
     print_board();
-    std::cout << (square_attacked(white, h3) ? "Yes" : "No") << std::endl;;
+
+    for(int i = 0; i < 64; i++){
+        std::cout << "Square: " << squareToCoord[i] << std::endl;
+        print_bitboard(get_bishop_attacks(i, white));
+        getchar();
+    }
 
     return 0;
 }

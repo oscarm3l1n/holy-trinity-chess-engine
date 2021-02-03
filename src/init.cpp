@@ -1,6 +1,6 @@
 #include "enum.h"
 
-void all_init(){
+void init(){
     // init attack
 
     for (int piece = P; piece <= k; piece++){

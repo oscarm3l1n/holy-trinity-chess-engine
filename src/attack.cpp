@@ -104,8 +104,51 @@ u64 generate_bishop_attacks(){
     return 0ULL;
 }
 
-u64 get_bishop_attacks(int square){
-    return bishopAttacks[square];
+u64 get_bishop_attacks(int square, int currentSide){
+    u64 newAttacks = 0ULL;
+    int i = square - 9;
+    while (i >= 0) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i -= 9;
+    }
+    i = square - 7;
+    while ( i >= 0) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i -= 7;
+    }
+    i = square + 7;
+    while ( i < 64) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i += 7;
+    }
+    i = square + 9;
+    while ( i < 64) {
+        if( !get_bit(occupancy[both], i) )
+            set_bit(newAttacks, i);
+        else {
+            set_bit(newAttacks, i);
+            break;
+        }
+        i += 9;
+    }
+    newAttacks &= ~(occupancy[currentSide]) | occupancy[!currentSide];
+    newAttacks &= bishopAttacks[square];
+    return newAttacks;
 }
 
 u64 get_rook_attacks(int square){
@@ -167,7 +210,6 @@ void init_slider_attacks(){
 // If we find a white piece within these attacked squares
 // we know that "because we can attack him, he can attack us"
 // therefore square is attacked
-
 bool square_attacked(int side, int square) {
 
     if (side == white) {
@@ -175,6 +217,7 @@ bool square_attacked(int side, int square) {
         print_bitboard(pawnAttacks[black][square] & bitboards[P]);
         print_bitboard(knightAttacks[square] & bitboards[N]);
         if ( pawnAttacks[black][square] & bitboards[P] )    return true;
+        // Knights
         if ( knightAttacks[square] & bitboards[N])          return true;
     } else {
 
