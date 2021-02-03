@@ -2,7 +2,11 @@
 Chess engine project with skurt1, ackebacked and kepan13
 
 # TO DO
-* Attack masks for bishop, rook, queen, king
-* get_bishop & rook attacks. Måste tänka på occupancy
-* Generate moves
-* is_square_attacked()
+* Generate moves --> move_ordering !!!
+* negamax                      ^|^
+* perft testing                 |
+* save & reset game state       |
+* killer moves (?)              |
+* quiesence search--------------
+* evaluation
+
