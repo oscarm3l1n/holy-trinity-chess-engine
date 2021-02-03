@@ -6,20 +6,23 @@
 
 #define STARTFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
+//RADERA FUNKTION OM DU VILL -erik
 void generate_bish(){
-    u64 a = 0x0201000000000000;
+    u64 empty = 0x0000000000000000;
+    
+    u64 a = 0x0201000000000000; //left down corner
     u64 b = 0x0402010000000000;
     u64 c = 0x0804020100000000;
     u64 d = 0x1008040201000000;
     u64 e = 0x2010080402010000;
     u64 f = 0x4020100804020100;
-    u64 g = 0x8040201008040201;
+    u64 g = 0x8040201008040201; //middle down
     u64 h = 0x0080402010080402;
-    u64 i = 0x0000804020100804;
-    u64 j = 0x0000008040201008;
+    u64 q = 0x0000804020100804;
+    u64 p = 0x0000008040201008;
     u64 k = 0x0000000080402010;
     u64 l = 0x0000000000804020;
-    u64 m = 0x0000000000008040;
+    u64 m = 0x0000000000008040; //right up corner
     
     u64 aa = 0x0000000000000102;
     u64 bb = 0x0000000000010204;
@@ -34,18 +37,31 @@ void generate_bish(){
     u64 kk = 0x1020408000000000;
     u64 ll = 0x2040800000000000;
     u64 mm = 0x4080000000000000;
+
+    u64 up[] = {cc, ii, kk, mm, empty};
+
+    for (int i = 10; i < 64; ++i){
+        for (int j = 0; j < 8; ++j){
+            int square = 9*j+i;
+            std::cout << "square: " << squareToCoord[square] << std::endl;
+            u64  result =  h | up[j];
+            clear_bit(result, square);
+            print_bitboard(result);
+            std::cout << result << "ULL," << std::endl << std::endl;
+            getchar();
+        }    
+    }
 }
 
-<<<<<<< HEAD
 int main(){
-    
-    generate_bishop_attacks();
-=======
->>>>>>> f0c0378043e10e3504ad7e4d515adf2e40ca46e4
+    // parse_fen((char*)STARTFEN);
+    // print_board();
+    // print_bitboard(occupancy[both]);
+    for (int i = 0; i < 64; ++i){
+        std::cout << "square: " << squareToCoord[i] << std::endl;
+        print_bitboard(bishopAttacks[i]);
+        getchar();
+    }
 
-int main(){
-    parse_fen((char*)STARTFEN);
-    print_board();
-    print_bitboard(occupancy[both]);
     return 0;
 }
