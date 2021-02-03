@@ -8,17 +8,17 @@
 
 #define FOR(n) for(int i = 0; i < n; i++)
 
+// https://lichess.org/editor
+// to create custom FEN's
 int main(){
     init();
+    init_leaper_attacks();
 
-    parse_fen( (char*) STARTFEN);
-    print_board();
+    parse_fen( (char*) "8/8/8/8/3r4/3b4/8/8 w - - 0 1");
+    // print_board();
 
-    FOR(64){
-        std::cout << "Square: " << squareToCoord[i] << std::endl;
-        print_bitboard(get_rook_attacks(i, white));
-        getchar();
-    }
+    print_attacked_squares(black);
+
 
     return 0;
 }

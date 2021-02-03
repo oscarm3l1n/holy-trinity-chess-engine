@@ -1,5 +1,6 @@
 #include "enum.h"
 
+
 void init(){
     // init attack
 

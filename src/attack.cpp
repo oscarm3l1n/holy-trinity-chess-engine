@@ -198,6 +198,13 @@ u64 get_rook_attacks(int square, int currentSide){
     return newAttacks;
 }
 
+u64 get_queen_attacks(int square, int currentSide){
+    u64 attacks = 0ULL;
+    attacks |= get_bishop_attacks(square, currentSide);
+    attacks |= get_rook_attacks(square, currentSide);
+    return attacks;
+}
+
 void generate_rook_attacks(){
     u64 a = 0xff;
     u64 b = 0xff00;
@@ -253,18 +260,41 @@ void init_slider_attacks(){
 // If we find a white piece within these attacked squares
 // we know that "because we can attack him, he can attack us"
 // therefore square is attacked
+
+// int side is the attacking side    // can speed this up by saving rook and bishop attacks for queen
 bool square_attacked(int side, int square) {
-
+    // Leaving them here if change is needed
+    // u64 queenAttacks;
+    // u64 rookAtks;
+    // u64 bishopAtks;
     if (side == white) {
-        // Pawns
-        print_bitboard(pawnAttacks[black][square] & bitboards[P]);
-        print_bitboard(knightAttacks[square] & bitboards[N]);
-        if ( pawnAttacks[black][square] & bitboards[P] )    return true;
-        // Knights
-        if ( knightAttacks[square] & bitboards[N])          return true;
+        // rookAtks = get_rook_attacks(square, black);
+        // bishopAtks = get_bishop_attacks(square, black);
+        // queenAttacks |= rookAtks | bishopAtks;
+        if ( pawnAttacks[black][square] & bitboards[P] )         return true;
+        if ( knightAttacks[square] & bitboards[N])               return true;
+        if ( kingAttacks[square] & bitboards[K])                 return true;
+        if ( get_rook_attacks(square, black) & bitboards[R])     return true;
+        if ( get_bishop_attacks(square, black) & bitboards[B])   return true;
+        if ( get_queen_attacks(square, black) & bitboards[Q])    return true; 
     } else {
-
+        if ( pawnAttacks[white][square] & bitboards[p] )         return true;
+        if ( knightAttacks[square] & bitboards[n])               return true;
+        if ( kingAttacks[square] & bitboards[k])                 return true;
+        if ( get_rook_attacks(square, white) & bitboards[r])     return true;
+        if ( get_bishop_attacks(square, white) & bitboards[b])   return true;
+        if ( get_queen_attacks(square, white) & bitboards[q])    return true; 
     }
-
     return false;
+}
+
+void print_attacked_squares(int side) {
+    std::cout << "all squares attacked by " << ((side == white) ? "white" : "black") << std::endl;
+    for(int rank = 0; rank < 8; rank++){
+        for(int file = 0; file < 8; file++){
+            int square = 8 * rank + file;
+            std::cout << (square_attacked(side, square) ? "X " : ". ");
+        }
+        printf("\n");
+    }
 }
