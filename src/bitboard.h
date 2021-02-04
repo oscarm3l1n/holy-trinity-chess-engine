@@ -63,5 +63,6 @@ void print_board(){
                 ((castlingRights & wq) ? 'Q' : '-') <<
                 ((castlingRights & bk) ? 'k' : '-') <<
                 ((castlingRights & bq) ? 'q' : '-') << std::endl;
+    printf("\n\n");
 
 }

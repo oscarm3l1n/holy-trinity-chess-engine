@@ -1,8 +1,8 @@
 #include <iostream>
-#include "bitboard.h"
-#include "attack.cpp"
-#include "uci.cpp"
-#include "init.cpp"
+// #include "bitboard.h"
+// #include "attack.cpp"
+// #include "uci.cpp"
+// #include "init.cpp"
 #include "moves.cpp"
 
 #define STARTFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -15,13 +15,13 @@ int main(){
     init();
     init_leaper_attacks();
 
-    // parse_fen( (char*) "8/8/ppp5/8/8/3b4/8/8 w - - 0 1");
-    // print_board();
+    std::vector<int> moveList;
 
-    // print_attacked_squares(black);
-    int move = encode_move(h1, h1, k, k, 1, 1, 1);
-    print_bitboard( (u64)move );
-    std::cout << move << std::endl;
+    parse_fen( (char*) "r3k2r/pp1ppppp/6q1/8/3pP3/8/8/Q1Q5 b kq e3 0 1");
+    print_board();
+
+    generate_moves(moveList);
+
 
     return 0;
 }
