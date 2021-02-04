@@ -314,3 +314,12 @@ void generate_moves(std::vector<int>& moveList) {
         }
     }
 }
+
+bool make_move(int move, bool captureMovesOnly){
+    
+    if (!captureMovesOnly){
+        
+    } else {
+        
+    }
+}

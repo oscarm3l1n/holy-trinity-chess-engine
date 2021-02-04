@@ -2,12 +2,11 @@
 Chess engine project with skurt1, ackebacked and kepan13
 
 # TO DO
-* Generate moves --> move_ordering !!!
-* negamax                      ^|^
-* perft testing                 |
-* save & reset game state       |
-* killer moves (?)              |
-* quiesence search--------------
+* make move function
+* negamax                      
+* perft testing                 
+* save & reset game state      
+* killer moves (?)              
+* quiesence search
 * evaluation
-* encode moves, store in integer and list / vector
 
