@@ -9,4 +9,5 @@ Chess engine project with skurt1, ackebacked and kepan13
 * killer moves (?)              |
 * quiesence search--------------
 * evaluation
+* encode moves, store in integer and list / vector
 
