@@ -13,6 +13,19 @@
 #define get_enPassantFlag(move) ((move & 0x400000) >> 22)
 #define get_castlingFlag(move)  ((move & 0x800000) >> 23)
 
+#define save_board()                                                            \
+    u64 bb_copy[12], occ_copy[3];                                               \
+    int side_copy, enpas_copy, castle_copy;                                     \
+    memcpy(bb_copy, bitboards, sizeof(bitboards));                              \
+    memcpy(occ_copy, occupancy, sizeof(occupancy));                             \
+    side_copy = side, enpas_copy = enPassant, castle_copy = castlingRights;     \
+
+    // restore state
+#define restore_board()                                                       \
+    memcpy(bitboards, bb_copy, sizeof(bitboards));                               \
+    memcpy(occupancy, occ_copy, sizeof(occupancy));                          \
+    side = side_copy, enPassant = enpas_copy, castlingRights = castle_copy;           \
+
 #define u64 unsigned long long
 
 enum {

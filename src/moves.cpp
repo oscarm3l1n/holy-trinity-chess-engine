@@ -263,7 +263,7 @@ void generate_moves(std::vector<int>& moveList) {
                     toSq = get_index(tempAttacks);
                     if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
                         add_move(moveList, encode_move(fromSq, toSq, piece, 0, 1, 0, 0, 0));
-                    } else {
+                    } else if (get_bit(tempAttacks, toSq) && !get_bit(occupancy[side], toSq)){
                         add_move(moveList, encode_move(fromSq, toSq, piece, 0, 0, 0, 0, 0));
                     }
                     clear_bit(tempAttacks, toSq);
@@ -315,11 +315,146 @@ void generate_moves(std::vector<int>& moveList) {
     }
 }
 
+
+const int castling_rights[64] = {
+     7, 15, 15, 15,  3, 15, 15, 11,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    13, 15, 15, 15, 12, 15, 15, 14
+};
+
+
+// fromSq, toSq, piece, promotedPiece, captureFlag, doubleMoveFlag, enPassantFlag, castlingFlag
 bool make_move(int move, bool captureMovesOnly){
-    
+    int from        = get_fromSq(move);
+    int to          = get_toSq(move);
+    int piece       = get_piece(move);
+    int promoted    = get_promotedPiece(move);
+    int capture     = get_captureFlag(move);
+    int doublePush  = get_doubleFlag(move);
+    int enPas       = get_enPassantFlag(move);
+    int castle      = get_castlingFlag(move);
+
+    save_board();
+
     if (!captureMovesOnly){
+        // make move
+        clear_bit(bitboards[piece], from);
+        set_bit(bitboards[piece], to);
+
+        // find the captured piece and pop it
+        if (side == white){
+            for(int i = p; i <= k; i++){
+                if (get_bit(bitboards[i], to)){
+                    clear_bit(bitboards[i], to);
+                    break;
+                }
+            }
+        } else {
+            for(int i = P; i <= K; i++){
+                if (get_bit(bitboards[i], to)){
+                    clear_bit(bitboards[i], to);
+                    break;
+                }
+            }
+        }
+
+        // handle en passant
+        if (enPas){
+            if (side == white){
+                clear_bit(bitboards[p], to + 8);
+            } else {
+                clear_bit(bitboards[P], to - 8);
+            }
+        }
+
+        // handle double push
+        if (doublePush) {
+            if (side == white){
+                enPassant = to + 8;
+            } else {
+                enPassant = to - 8;
+            }
+        }
+
+        // handle castling
+        if (castle) {
+            switch (to){
+            case g1:
+                clear_bit(bitboards[R], h1);
+                set_bit(bitboards[R], e1);
+                clear_bit(bitboards[K], e1);
+                set_bit(bitboards[K], g1);
+                break;
+            case c1:
+                clear_bit(bitboards[R], a1);
+                set_bit(bitboards[R], d1);
+                clear_bit(bitboards[K], e1);
+                set_bit(bitboards[K], c1);
+                break;
+            case g8:
+                clear_bit(bitboards[R], h1);
+                set_bit(bitboards[R], e1);
+                clear_bit(bitboards[K], e1);
+                set_bit(bitboards[K], g1);
+                break;
+            case c8:
+                clear_bit(bitboards[R], a8);
+                set_bit(bitboards[R], d8);
+                clear_bit(bitboards[K], e8);
+                set_bit(bitboards[K], c8);
+                break;
+            }
+        }
+
+        // handle promotion
+        if (promoted) {
+            if (side == white){
+                clear_bit(bitboards[P], to);
+                set_bit(bitboards[promoted], to);
+            } else {
+                clear_bit(bitboards[p], to);
+                set_bit(bitboards[promoted], to);
+            }
+        }
+
+        // update castling rights
+        castlingRights &= castling_rights[from];
+        castlingRights &= castling_rights[to];
+
+        memset(occupancy, 0ULL, sizeof(occupancy));
+
+        // set occupancy
+        for(int i = P; i <= K; i++)
+            occupancy[white] |= bitboards[i];
+        for(int i = p; i <= k; i++)
+            occupancy[black] |= bitboards[i];
+
+        occupancy[both] |= occupancy[white];
+        occupancy[both] |= occupancy[black];
+
         
+        // check so king is not in check
+        
+        bool illegalMove;
+        int kingSq = (side == white) ? get_index(bitboards[K]) : get_index(bitboards[k]);
+        illegalMove = square_attacked(!side, kingSq);
+
+        side ^= 1;
+
+        if (illegalMove){
+            // restore board and return illegal move
+            std::cout << "king is attacked!" << std::endl;
+            restore_board();
+            return false;
+        } else {
+            return true;
+        }
     } else {
-        
+        return false;
     }
 }

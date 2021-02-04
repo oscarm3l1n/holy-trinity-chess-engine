@@ -16,12 +16,23 @@ int main(){
     init_leaper_attacks();
 
 
-    parse_fen( (char*) "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
-    print_board();
-
+    parse_fen( (char*) STARTFEN);
     std::vector<int> moveList;
     generate_moves(moveList);
-    print_moves(moveList);
+
+    for(int i = 0; i < moveList.size(); i++){
+
+        int move = moveList[i];
+        save_board();
+        if (!make_move(move, false))
+            continue;
+        print_board();
+        getchar();
+        restore_board();
+        print_board();
+        getchar();
+
+    }
 
 
     return 0;
