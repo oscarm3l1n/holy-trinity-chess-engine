@@ -17,7 +17,7 @@ int main(){
 
     std::vector<int> moveList;
 
-    parse_fen( (char*) "r3k2r/pp1ppppp/6q1/8/3pP3/8/8/Q1Q5 b kq e3 0 1");
+    parse_fen( (char*) "1r6/r1k5/1q6/8/8/8/8/k7 b KQkq - 0 1");
     print_board();
 
     generate_moves(moveList);

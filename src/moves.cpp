@@ -221,5 +221,101 @@ void generate_moves(std::vector<int>& moveList) {
                 }
             }
         }
+
+        // Rooks
+        if ((side == white) ? piece == R : piece == r) {
+            while(tempBitboard) {
+                fromSq = get_index(tempBitboard);
+                tempAttacks = get_rook_attacks(fromSq, side);
+                while (tempAttacks){
+                    toSq = get_index(tempAttacks);
+                    if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
+                        // capture move
+                        print_move("capture",fromSq, toSq);
+                    } else {
+                        // quiet
+                        print_move("",fromSq, toSq);
+                    }
+                    clear_bit(tempAttacks, toSq);
+                }
+                clear_bit(tempBitboard, fromSq);
+            }
+        }
+        // Bishops
+        if ((side == white) ? piece == B : piece == b) {
+            while(tempBitboard) {
+                fromSq = get_index(tempBitboard);
+                tempAttacks = get_bishop_attacks(fromSq, side);
+                while (tempAttacks){
+                    toSq = get_index(tempAttacks);
+                    if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
+                        // capture move
+                        print_move("capture",fromSq, toSq);
+                    } else {
+                        // quiet
+                        print_move("",fromSq, toSq);
+                    }
+                    clear_bit(tempAttacks, toSq);
+                }
+                clear_bit(tempBitboard, fromSq);
+            }
+        }
+        // Knights
+        if ((side == white) ? piece == N : piece == n){
+            while (tempBitboard){   
+                fromSq = get_index(tempBitboard);
+                tempAttacks = knightAttacks[fromSq];
+                while (tempAttacks){
+                    toSq = get_index(tempAttacks);
+                    if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
+                        print_move("capture",fromSq,toSq);
+                    } else {
+                        print_move("",fromSq,toSq);
+                    }
+                    clear_bit(tempAttacks, toSq);
+                }
+
+                clear_bit(tempBitboard, fromSq);
+            }
+        }
+
+        // Queens
+        if ((side == white) ? piece == Q : piece == q) {
+            while(tempBitboard) {
+                fromSq = get_index(tempBitboard);
+                tempAttacks = get_bishop_attacks(fromSq, side);
+                tempAttacks |= get_rook_attacks(fromSq, side);
+                while (tempAttacks){
+                    toSq = get_index(tempAttacks);
+                    if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
+                        // capture move
+                        print_move("capture",fromSq, toSq);
+                    } else {
+                        // quiet
+                        print_move("",fromSq, toSq);
+                    }
+                    clear_bit(tempAttacks, toSq);
+                }
+                clear_bit(tempBitboard, fromSq);
+            }
+        }
+        // Kings
+        if ((side == white) ? piece == K : piece == k){
+            while (tempBitboard){   
+                fromSq = get_index(tempBitboard);
+                tempAttacks = kingAttacks[fromSq];
+                while (tempAttacks){
+                    toSq = get_index(tempAttacks);
+                    if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
+                        print_move("capture",fromSq,toSq);
+                    } else {
+                        print_move("",fromSq,toSq);
+                    }
+                    clear_bit(tempAttacks, toSq);
+                }
+
+                clear_bit(tempBitboard, fromSq);
+            }
+        }
     }
 }
