@@ -33,7 +33,7 @@ std::string squareToCoord[65] = {
 
 // pieces
 enum {P,B,N,Q,R,K,p,b,n,q,r,k,noPiece};
-std::unordered_map<int, char> char_pieces = {
+std::unordered_map<char, int> char_pieces = {
     {'P', P},
     {'N', N},
     {'B', B},

@@ -14,8 +14,8 @@ int main(){
     init();
     init_leaper_attacks();
 
-    parse_fen( (char*) "8/8/8/8/3r4/3b4/8/8 w - - 0 1");
-    // print_board();
+    parse_fen( (char*) "8/8/ppp5/8/8/3b4/8/8 w - - 0 1");
+    print_board();
 
     print_attacked_squares(black);
 
