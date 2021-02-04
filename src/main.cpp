@@ -15,12 +15,13 @@ int main(){
     init();
     init_leaper_attacks();
 
-    std::vector<int> moveList;
 
-    parse_fen( (char*) "1r6/r1k5/1q6/8/8/8/8/k7 b KQkq - 0 1");
+    parse_fen( (char*) "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
     print_board();
 
+    std::vector<int> moveList;
     generate_moves(moveList);
+    print_moves(moveList);
 
 
     return 0;

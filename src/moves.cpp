@@ -33,8 +33,27 @@ void add_move(std::vector<int>& moveList, int move){
     moveList.push_back(move);
 }
 
-void print_move(std::string type, int fromSq, int toSq){
-    std::cout << squareToCoord[fromSq] << squareToCoord[toSq] << " " << type << " " << std::endl;
+// #define get_fromSq(move)        (move & 0x3f)
+// #define get_toSq(move)          ((move & 0xfc0) >> 6)
+// #define get_piece(move)         ((move & 0xf000) >> 12)
+// #define get_promotedPiece(move) ((move & 0xf0000) >> 16)
+// #define get_captureFlag(move)   (move & 0x100000)
+// #define get_doubleFlag(move) (move & 0x200000)
+// #define get_enPassantFlag(move) (move & 0x400000)
+// #define get_castlingFlag(move)  (move & 0x800000)
+void print_moves(std::vector<int>& moveList){
+    std::cout << "move      piece   promot      capt    doubl       EP      castl" << std::endl;
+    for ( int i = 0; i < moveList.size(); i++){
+        int move = moveList[i];
+        std::cout << squareToCoord[get_fromSq(move)] <<
+                     squareToCoord[get_toSq(move)]   << "       " << 
+                     asciiPieces[get_piece(move)]    << "        " <<
+                     (get_promotedPiece(move) ? asciiPieces[get_promotedPiece(move)] : 0) <<"         "<<
+                     get_captureFlag(move)          << "         " <<
+                     get_doubleFlag(move)           << "          " <<
+                     get_enPassantFlag(move)        << "          " <<
+                     get_castlingFlag(move)         << "          " << std::endl;
+    }
 }
 
 // start generating all quiet moves
@@ -62,22 +81,16 @@ void generate_moves(std::vector<int>& moveList) {
                     if ( (toSq > 0) && !get_bit(occupancy[both], toSq)){
                         // pawn promotion
                         if ( fromSq >= a7 && fromSq <= h7){
-                            // add_move(moveList, encode_move(fromSq, toSq, P, Q, 0, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, N, 0, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, B, 0, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, R, 0, 0, 0, 0));
-                            print_move("normal promotion Q", fromSq, toSq);
-                            print_move("normal promotion N", fromSq, toSq);
-                            print_move("normal promotion B", fromSq, toSq);
-                            print_move("normal promotion R", fromSq, toSq);
+                            add_move(moveList, encode_move(fromSq, toSq, P, Q, 0, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, P, N, 0, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, P, B, 0, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, P, R, 0, 0, 0, 0));
                         } else {
                             // one square forward                    
-                            // add_move(moveList, encode_move(fromSq, toSq, P, 0, 0, 0, 0, 0));
-                            print_move("one square forward", fromSq, toSq);
+                            add_move(moveList, encode_move(fromSq, toSq, P, 0, 0, 0, 0, 0));
                             // two squares forward
                             if ( (fromSq >= a2 && fromSq <= h2) && !get_bit(occupancy[both], toSq - 8)){
-                                // add_move(moveList, encode_move(fromSq, toSq-8, P, 0, 0, 1, 1, 0));
-                                print_move("two squares forward", fromSq, toSq-8);
+                                add_move(moveList, encode_move(fromSq, toSq - 8, P, 0, 0, 1, 1, 0));
                             }
                         }
                     }
@@ -88,19 +101,13 @@ void generate_moves(std::vector<int>& moveList) {
 
                         // promotion
                         if ( fromSq >= a7 && fromSq <= h7){
-                            // add_move(moveList, encode_move(fromSq, toSq, P, Q, 1, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, N, 1, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, B, 1, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, R, 1, 0, 0, 0));
-                            print_move("capture promotion Q", fromSq, toSq);
-                            print_move("capture promotion N", fromSq, toSq);
-                            print_move("capture promotion B", fromSq, toSq);
-                            print_move("capture promotion R", fromSq, toSq);
-                            
+                            add_move(moveList, encode_move(fromSq, toSq, P, Q, 1, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, P, N, 1, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, P, B, 1, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, P, R, 1, 0, 0, 0));
                         } else {
                             // normal capture
-                            // add_move(moveList, encode_move(fromSq, toSq, P, 0, 1, 0, 0, 0));
-                            print_move("capture move", fromSq, toSq);
+                            add_move(moveList, encode_move(fromSq, toSq, P, 0, 1, 0, 0, 0));
                         }
                         clear_bit(tempAttacks, toSq);
                     }
@@ -108,8 +115,7 @@ void generate_moves(std::vector<int>& moveList) {
                     if (enPassant != noSquare) {
                         if (pawnAttacks[white][fromSq] & (1ULL << enPassant)){
                             // int targetSq = get_index(enPassAttack);
-                            // add move
-                            print_move("En passant", fromSq, enPassant);
+                            add_move(moveList, encode_move(fromSq, enPassant, P, 0, 1, 0, 0, 0));
                         }
                     }
                     clear_bit(tempBitboard, fromSq);
@@ -123,14 +129,14 @@ void generate_moves(std::vector<int>& moveList) {
                         // Check so squares are not attacked
                         if (!square_attacked(black, f1) && !square_attacked(black, g1)){
                             // castle king side
-                            print_move("Castle kingside", e1, g1);
+                            add_move(moveList, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
                         }
                     }
                 }
                 if (castlingRights & wq){
                     if (!get_bit(occupancy[both], d1) && !get_bit(occupancy[both], c1) && !get_bit(occupancy[both], b1)){
                         if(!square_attacked(black, d1) && !square_attacked(black, c1)){
-                            print_move("Castle queenside",e1,c1);
+                            add_move(moveList, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
                         }
                     }
                 }
@@ -147,22 +153,17 @@ void generate_moves(std::vector<int>& moveList) {
                     if ( (toSq < 64) && !get_bit(occupancy[both], toSq)){
                         // pawn promotion
                         if ( fromSq >= a2 && fromSq <= h2){
-                            // add_move(moveList, encode_move(fromSq, toSq, P, Q, 0, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, N, 0, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, B, 0, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, R, 0, 0, 0, 0));
-                            print_move("normal promotion Q", fromSq, toSq);
-                            print_move("normal promotion N", fromSq, toSq);
-                            print_move("normal promotion B", fromSq, toSq);
-                            print_move("normal promotion R", fromSq, toSq);
+                            add_move(moveList, encode_move(fromSq, toSq, p, q, 0, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, p, n, 0, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, p, b, 0, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, p, r, 0, 0, 0, 0));
                         } else {
                             // one square forward                    
-                            // add_move(moveList, encode_move(fromSq, toSq, P, 0, 0, 0, 0, 0));
-                            print_move("one square forward", fromSq, toSq);
+                            add_move(moveList, encode_move(fromSq, toSq, p, 0, 0, 0, 0, 0));
+                            
                             // two squares forward
                             if ( (fromSq >= a7 && fromSq <= h7) && !get_bit(occupancy[both], toSq + 8)){
-                                // add_move(moveList, encode_move(fromSq, toSq-8, P, 0, 0, 1, 1, 0));
-                                print_move("two squares forward", fromSq, toSq + 8);
+                                add_move(moveList, encode_move(fromSq, toSq + 8, p, 0, 0, 1, 1, 0));
                             }
                         }
                     }
@@ -173,19 +174,13 @@ void generate_moves(std::vector<int>& moveList) {
 
                         // promotion
                         if ( fromSq >= a2 && fromSq <= h2){
-                            // add_move(moveList, encode_move(fromSq, toSq, P, Q, 1, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, N, 1, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, B, 1, 0, 0, 0));
-                            // add_move(moveList, encode_move(fromSq, toSq, P, R, 1, 0, 0, 0));
-                            print_move("capture promotion Q", fromSq, toSq);
-                            print_move("capture promotion N", fromSq, toSq);
-                            print_move("capture promotion B", fromSq, toSq);
-                            print_move("capture promotion R", fromSq, toSq);
-                            
+                            add_move(moveList, encode_move(fromSq, toSq, p, q, 1, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, p, b, 1, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, p, r, 1, 0, 0, 0));
+                            add_move(moveList, encode_move(fromSq, toSq, p, n, 1, 0, 0, 0));
                         } else {
                             // normal capture
-                            // add_move(moveList, encode_move(fromSq, toSq, P, 0, 1, 0, 0, 0));
-                            print_move("capture move", fromSq, toSq);
+                            add_move(moveList, encode_move(fromSq, toSq, p, 0, 1, 0, 0, 0));
                         }
                         clear_bit(tempAttacks, toSq);
                     }
@@ -193,8 +188,7 @@ void generate_moves(std::vector<int>& moveList) {
                     if (enPassant != noSquare) {
                         if (pawnAttacks[black][fromSq] & (1ULL << enPassant)){
                             // int targetSq = get_index(enPassAttack);
-                            // add move
-                            print_move("En passant", fromSq, enPassant);
+                            add_move(moveList, encode_move(fromSq, enPassant, p, 0, 1, 0, 0, 0));
                         }
                     }
                     clear_bit(tempBitboard, fromSq);
@@ -208,14 +202,14 @@ void generate_moves(std::vector<int>& moveList) {
                         // Check so squares are not attacked
                         if (!square_attacked(white, f8) && !square_attacked(white, g8)){
                             // castle king side
-                            print_move("Castle kingside", e8, g8);
+                            add_move(moveList, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
                         }
                     }
                 }
                 if (castlingRights & bq){
                     if (!get_bit(occupancy[both], d8) && !get_bit(occupancy[both], c8) && !get_bit(occupancy[both], b8)){
                         if(!square_attacked(white, d8) && !square_attacked(white, c8)){
-                            print_move("Castle queenside",e8,c8);
+                            add_move(moveList, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
                         }
                     }
                 }
@@ -231,10 +225,10 @@ void generate_moves(std::vector<int>& moveList) {
                     toSq = get_index(tempAttacks);
                     if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
                         // capture move
-                        print_move("capture",fromSq, toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 1, 0, 0, 0));
                     } else {
                         // quiet
-                        print_move("",fromSq, toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 0, 0, 0, 0));
                     }
                     clear_bit(tempAttacks, toSq);
                 }
@@ -250,10 +244,10 @@ void generate_moves(std::vector<int>& moveList) {
                     toSq = get_index(tempAttacks);
                     if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
                         // capture move
-                        print_move("capture",fromSq, toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 1, 0, 0, 0));
                     } else {
                         // quiet
-                        print_move("",fromSq, toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 0, 0, 0, 0));
                     }
                     clear_bit(tempAttacks, toSq);
                 }
@@ -268,9 +262,9 @@ void generate_moves(std::vector<int>& moveList) {
                 while (tempAttacks){
                     toSq = get_index(tempAttacks);
                     if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
-                        print_move("capture",fromSq,toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 1, 0, 0, 0));
                     } else {
-                        print_move("",fromSq,toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 0, 0, 0, 0));
                     }
                     clear_bit(tempAttacks, toSq);
                 }
@@ -289,10 +283,10 @@ void generate_moves(std::vector<int>& moveList) {
                     toSq = get_index(tempAttacks);
                     if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
                         // capture move
-                        print_move("capture",fromSq, toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 1, 0, 0, 0));
                     } else {
                         // quiet
-                        print_move("",fromSq, toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 0, 0, 0, 0));
                     }
                     clear_bit(tempAttacks, toSq);
                 }
@@ -307,9 +301,10 @@ void generate_moves(std::vector<int>& moveList) {
                 while (tempAttacks){
                     toSq = get_index(tempAttacks);
                     if (get_bit(tempAttacks, toSq) && get_bit(occupancy[!side], toSq)){
-                        print_move("capture",fromSq,toSq);
-                    } else {
-                        print_move("",fromSq,toSq);
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 1, 0, 0, 0));
+                    } 
+                    else if (get_bit(tempAttacks, toSq) && !get_bit(occupancy[side], toSq)) {
+                        add_move(moveList, encode_move(fromSq, toSq, piece, 0, 0, 0, 0, 0));
                     }
                     clear_bit(tempAttacks, toSq);
                 }

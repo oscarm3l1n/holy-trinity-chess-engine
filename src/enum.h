@@ -8,10 +8,10 @@
 #define get_toSq(move)          ((move & 0xfc0) >> 6)
 #define get_piece(move)         ((move & 0xf000) >> 12)
 #define get_promotedPiece(move) ((move & 0xf0000) >> 16)
-#define get_captureFlag(move)   (move & 0x100000)
-#define get_doubleFlag(move) (move & 0x200000)
-#define get_enPassantFlag(move) (move & 0x400000)
-#define get_castlingFlag(move)  (move & 0x800000)
+#define get_captureFlag(move)   ((move & 0x100000) >> 20)
+#define get_doubleFlag(move)    ((move & 0x200000) >> 21)
+#define get_enPassantFlag(move) ((move & 0x400000) >> 22)
+#define get_castlingFlag(move)  ((move & 0x800000) >> 23)
 
 #define u64 unsigned long long
 
