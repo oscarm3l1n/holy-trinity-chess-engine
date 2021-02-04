@@ -371,6 +371,7 @@ bool make_move(int move, bool captureMovesOnly){
                 clear_bit(bitboards[P], to - 8);
             }
         }
+        enPassant = noSquare;
 
         // handle double push
         if (doublePush) {
@@ -386,7 +387,7 @@ bool make_move(int move, bool captureMovesOnly){
             switch (to){
             case g1:
                 clear_bit(bitboards[R], h1);
-                set_bit(bitboards[R], e1);
+                set_bit(bitboards[R], f1);
                 clear_bit(bitboards[K], e1);
                 set_bit(bitboards[K], g1);
                 break;
@@ -397,16 +398,16 @@ bool make_move(int move, bool captureMovesOnly){
                 set_bit(bitboards[K], c1);
                 break;
             case g8:
-                clear_bit(bitboards[R], h1);
-                set_bit(bitboards[R], e1);
-                clear_bit(bitboards[K], e1);
-                set_bit(bitboards[K], g1);
+                clear_bit(bitboards[r], h8);
+                set_bit(bitboards[r], f8);
+                clear_bit(bitboards[k], e8);
+                set_bit(bitboards[k], g8);
                 break;
             case c8:
-                clear_bit(bitboards[R], a8);
-                set_bit(bitboards[R], d8);
-                clear_bit(bitboards[K], e8);
-                set_bit(bitboards[K], c8);
+                clear_bit(bitboards[r], a8);
+                set_bit(bitboards[r], d8);
+                clear_bit(bitboards[k], e8);
+                set_bit(bitboards[k], c8);
                 break;
             }
         }
@@ -448,7 +449,6 @@ bool make_move(int move, bool captureMovesOnly){
 
         if (illegalMove){
             // restore board and return illegal move
-            std::cout << "king is attacked!" << std::endl;
             restore_board();
             return false;
         } else {
