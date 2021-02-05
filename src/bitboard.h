@@ -13,11 +13,12 @@ void print_bitboard(u64 bitboard){
             int square = 8 * rank + file;
             if (!file)
                 std::cout << 8 - rank << "  ";
-            std::cout << get_bit(bitboard, square) << " ";
+            std::cout << get_bit(bitboard, square) << "  ";
         }
         std::cout << std::endl;
     }
-    std::cout << "\n   a b c d e f g h\n\n";
+    std::cout << "\n   a  b  c  d  e  f  g  h\n\n";
+    printf("    bitboard: %llud", bitboard);
 }
 
 int count_bits(u64 bitboard){

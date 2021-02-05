@@ -56,6 +56,11 @@ void print_moves(std::vector<int>& moveList){
     }
 }
 
+void print_one_move(int move){
+    std::cout << "\""<<squareToCoord[get_fromSq(move)] <<
+                squareToCoord[get_toSq(move)]   << "\", "; 
+}
+
 // start generating all quiet moves
 // which means the moves where no captures
 // are made
@@ -78,7 +83,7 @@ void generate_moves(std::vector<int>& moveList) {
 
                     // Pawn quiet moves
                     // check if the square is empty
-                    if ( (toSq > 0) && !get_bit(occupancy[both], toSq)){
+                    if ( !(toSq < a8) && !get_bit(occupancy[both], toSq)){
                         // pawn promotion
                         if ( fromSq >= a7 && fromSq <= h7){
                             add_move(moveList, encode_move(fromSq, toSq, P, Q, 0, 0, 0, 0));
@@ -113,9 +118,12 @@ void generate_moves(std::vector<int>& moveList) {
                     }
                     // En passant
                     if (enPassant != noSquare) {
-                        if (pawnAttacks[white][fromSq] & (1ULL << enPassant)){
-                            // int targetSq = get_index(enPassAttack);
-                            add_move(moveList, encode_move(fromSq, enPassant, P, 0, 1, 0, 0, 0));
+                        u64 enPassAttack = pawnAttacks[white][fromSq] & (1ULL << enPassant);
+                        if (enPassAttack) {
+                            int target = get_index(enPassAttack);
+                            add_move(moveList, encode_move(fromSq, target, P, 0, 1, 0, 1, 0));
+
+                            clear_bit(enPassAttack, target);
                         }
                     }
                     clear_bit(tempBitboard, fromSq);
@@ -186,9 +194,12 @@ void generate_moves(std::vector<int>& moveList) {
                     }
                     // En passant
                     if (enPassant != noSquare) {
-                        if (pawnAttacks[black][fromSq] & (1ULL << enPassant)){
-                            // int targetSq = get_index(enPassAttack);
-                            add_move(moveList, encode_move(fromSq, enPassant, p, 0, 1, 0, 0, 0));
+                        u64 enPassAttack = pawnAttacks[black][fromSq] & (1ULL << enPassant);
+                        if (enPassAttack) {
+                            int target = get_index(enPassAttack);
+                            add_move(moveList, encode_move(fromSq, target, p, 0, 1, 0, 1, 0));
+
+                            clear_bit(enPassAttack, target);
                         }
                     }
                     clear_bit(tempBitboard, fromSq);
@@ -363,6 +374,11 @@ bool make_move(int move, bool captureMovesOnly){
             }
         }
 
+        // handle promotion
+        if (promoted) {
+            clear_bit(bitboards[piece], to);
+            set_bit(bitboards[promoted], to);
+        }
         // handle en passant
         if (enPas){
             if (side == white){
@@ -412,16 +428,6 @@ bool make_move(int move, bool captureMovesOnly){
             }
         }
 
-        // handle promotion
-        if (promoted) {
-            if (side == white){
-                clear_bit(bitboards[P], to);
-                set_bit(bitboards[promoted], to);
-            } else {
-                clear_bit(bitboards[p], to);
-                set_bit(bitboards[promoted], to);
-            }
-        }
 
         // update castling rights
         castlingRights &= castling_rights[from];
@@ -440,7 +446,6 @@ bool make_move(int move, bool captureMovesOnly){
 
         
         // check so king is not in check
-        
         bool illegalMove;
         int kingSq = (side == white) ? get_index(bitboards[K]) : get_index(bitboards[k]);
         illegalMove = square_attacked(!side, kingSq);
@@ -457,4 +462,44 @@ bool make_move(int move, bool captureMovesOnly){
     } else {
         return false;
     }
+}
+
+// AI
+
+#define INFINITY 50000
+int bestMove = 0;
+long nodes = 0;
+
+int evaluate(){
+    return 0;
+}
+
+int negamax(int depth, int alpha, int beta){
+    if (depth == 0){
+        nodes++;
+        return evaluate();
+    }
+    int legal_moves = 0;
+    std::vector<int> moveList;
+    generate_moves(moveList);
+
+    for( int i = 0; i < moveList.size(); i++){
+        int move = moveList[i];
+        save_board();
+        if (!make_move(move, false))
+            continue;
+        int score = -negamax(depth - 1, -beta, -alpha);
+        restore_board();
+    }
+
+}
+
+int findMove(int depth){
+    int score = negamax(3, -INFINITY, INFINITY);
+    printf("info score cp %d depth %d nodes %ld\n", score, depth, nodes);
+    std::cout << squareToCoord[get_fromSq(bestMove)] 
+                << squareToCoord[get_toSq(bestMove)]
+                << asciiPieces[get_promotedPiece(bestMove)]
+                << std::endl;
+    return 0;
 }

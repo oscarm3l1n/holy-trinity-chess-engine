@@ -388,7 +388,8 @@ void init_leaper_attacks(){
     }
 }
 
-void init_slider_attacks(){
+
+void init_slider_attacks(int bishop){
 
 }
 
