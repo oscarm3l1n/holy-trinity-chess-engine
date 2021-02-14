@@ -5,7 +5,7 @@
 // #include "init.cpp"
 #include "moves.cpp"
 
-#define STARTFEN (char*)"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+#define STARTFEN (char*) "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 #define RANDOM (char*)"r3k2r/pppppppp/1n1q4/2b1bn2/3NB3/1Q6/PPPPPPPP/R3K2R b KQkq - 0 1"
 #define ENPAS (char*) "8/pp1ppppp/8/2pP4/8/8/8/8 w - c6 0 1"
 #define TRICKY (char*) "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -  "
@@ -28,11 +28,6 @@ int perft_test(int depth){
         if (!make_move(ml[i], false))
             continue;
         num_positions += perft_test(depth-1);
-        // if (depth == 4){
-        //     print_one_move(ml[i]);
-        //     std::cout << " " << num_positions << std::endl;
-        //     num_positions = 0;
-        // }
         restore_board();
     }
     return num_positions;
@@ -68,9 +63,9 @@ int main(){
     init();
     init_leaper_attacks();
 
-    init_slider_attacks(0);
-    init_slider_attacks(1);
-
+    parse_fen(STARTFEN);
+    print_board();
+    findMove(5);
 
     return 0;
 }

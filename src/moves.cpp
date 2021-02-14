@@ -72,8 +72,6 @@ std::string print_one_move(int move){
     if (get_promotedPiece(move))
         s += std::tolower(asciiPieces[get_promotedPiece(move)]);
     
-    std::cout << s;
-
     return s;
 }
 
@@ -483,32 +481,7 @@ bool make_move(int move, bool captureMovesOnly){
 // AI
 
 #define INFINITY 50000
-int bestMove = 0;
-long nodes = 0;
 
-int evaluate(){
-    return 0;
-}
-
-// int negamax(int depth, int alpha, int beta){
-//     if (depth == 0){
-//         nodes++;
-//         return evaluate();
-//     }
-//     int legal_moves = 0;
-//     std::vector<int> moveList;
-//     generate_moves(moveList);
-
-//     for( int i = 0; i < moveList.size(); i++){
-//         int move = moveList[i];
-//         save_board();
-//         if (!make_move(move, false))
-//             continue;
-//         int score = -negamax(depth - 1, -beta, -alpha);
-//         restore_board();
-//     }
-//     return 0;
-// }
 
 void generate_legal_moves(std::vector<int>& moveList){
     std::vector<int> tempList;
@@ -523,13 +496,50 @@ void generate_legal_moves(std::vector<int>& moveList){
     }
 }
 
+bool is_check(){
+    int square;
 
-// int findMove(int depth){
-//     int score = negamax(3, -INFINITY, INFINITY);
-//     printf("info score cp %d depth %d nodes %ld\n", score, depth, nodes);
-//     std::cout << squareToCoord[get_fromSq(bestMove)] 
-//                 << squareToCoord[get_toSq(bestMove)]
-//                 << asciiPieces[get_promotedPiece(bestMove)]
-//                 << std::endl;
-//     return 0;
-// }
+    if (side == white){
+        square = get_index(bitboards[K]);
+        if (square_attacked(black, square))
+            return true;
+    } else {
+        square = get_index(bitboards[k]);
+        if (square_attacked(white, square))
+            return true;
+    }
+    return false;
+}
+
+int evaluate(){
+    int score = 0;
+    
+    // add up all material
+    score += 100 * (count_bits(bitboards[P]) - count_bits(bitboards[p]));
+    score += 320 * (count_bits(bitboards[N]) - count_bits(bitboards[n]));
+    score += 350 * (count_bits(bitboards[B]) - count_bits(bitboards[b]));
+    score += 500 * (count_bits(bitboards[R]) - count_bits(bitboards[r]));
+    score += 900 * (count_bits(bitboards[Q]) - count_bits(bitboards[q]));
+    score += INFINITY * (count_bits(bitboards[K]) - count_bits(bitboards[k]));
+
+    return score;
+}
+
+
+int bestMove = 0;
+int ply = 0;
+int nodes = 0;
+
+int negamax(int depth, int alpha, int beta){
+    // TODO
+}
+
+void order_moves(std::vector<int> moveList){
+    // TODO
+}
+
+void findMove(int depth){
+    int score = negamax(depth, -INFINITY, INFINITY);
+    
+    std::cout << "bestmove " << print_one_move(bestMove) << std::endl;
+}
