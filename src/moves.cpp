@@ -6,6 +6,8 @@
 #include "uci.cpp"
 #include "init.cpp"
 
+#include <fstream>
+
 // store the whole move in an integer i.e. 32 bits
 // 00000000 00000000 00000000 00111111 fromSquare       6 bits
 // 00000000 00000000 00001111 11000000 toSquare         6 bits ( >> 6)
@@ -42,30 +44,44 @@ void add_move(std::vector<int>& moveList, int move){
 // #define get_enPassantFlag(move) (move & 0x400000)
 // #define get_castlingFlag(move)  (move & 0x800000)
 void print_moves(std::vector<int>& moveList){
-    std::cout << "move      piece   promot      capt    doubl       EP      castl" << std::endl;
-    for ( int i = 0; i < moveList.size(); i++){
+    // std::cout << "move      piece   promot      capt    doubl       EP      castl" << std::endl;
+    // for ( int i = 0; i < moveList.size(); i++){
+    //     int move = moveList[i];
+    //     std::cout << squareToCoord[get_fromSq(move)] <<
+    //                  squareToCoord[get_toSq(move)]   << "       " << 
+    //                  asciiPieces[get_piece(move)]    << "        " <<
+    //                  asciiPieces[get_promotedPiece(move)] <<"         "<<
+    //                  get_captureFlag(move)          << "         " <<
+    //                  get_doubleFlag(move)           << "          " <<
+    //                  get_enPassantFlag(move)        << "          " <<
+    //                  get_castlingFlag(move)         << "          " << std::endl;
+    // }
+    for (int i = 0; i < moveList.size(); i++){
+
         int move = moveList[i];
-        std::cout << squareToCoord[get_fromSq(move)] <<
-                     squareToCoord[get_toSq(move)]   << "       " << 
-                     asciiPieces[get_piece(move)]    << "        " <<
-                     (get_promotedPiece(move) ? asciiPieces[get_promotedPiece(move)] : 0) <<"         "<<
-                     get_captureFlag(move)          << "         " <<
-                     get_doubleFlag(move)           << "          " <<
-                     get_enPassantFlag(move)        << "          " <<
-                     get_castlingFlag(move)         << "          " << std::endl;
+        std::string s = squareToCoord[get_fromSq(move)] + squareToCoord[get_toSq(move)];
+        if (get_promotedPiece(move)){
+            s += asciiPieces[get_promotedPiece(move)];
+        }
+        std::cout << s << std::endl;
     }
 }
 
-void print_one_move(int move){
-    std::cout << "\""<<squareToCoord[get_fromSq(move)] <<
-                squareToCoord[get_toSq(move)]   << "\", "; 
+std::string print_one_move(int move){
+    std::string s = squareToCoord[get_fromSq(move)] + squareToCoord[get_toSq(move)];
+    if (get_promotedPiece(move))
+        s += std::tolower(asciiPieces[get_promotedPiece(move)]);
+    
+    std::cout << s;
+
+    return s;
 }
 
 // start generating all quiet moves
 // which means the moves where no captures
 // are made
 // encode_move (from, to, piece, promPiece, capture, double, EP, castling)
-void generate_moves(std::vector<int>& moveList) {
+void generate_pseudo_moves(std::vector<int>& moveList) {
     int fromSq;
     int toSq;
     int move;
@@ -135,7 +151,7 @@ void generate_moves(std::vector<int>& moveList) {
                     // Check so squares are not blocked
                     if (!get_bit(occupancy[both], f1) && !get_bit(occupancy[both], g1)){
                         // Check so squares are not attacked
-                        if (!square_attacked(black, f1) && !square_attacked(black, g1)){
+                        if (!square_attacked(black, f1) && !square_attacked(black, g1) && !square_attacked(black, e1)){
                             // castle king side
                             add_move(moveList, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
                         }
@@ -143,7 +159,7 @@ void generate_moves(std::vector<int>& moveList) {
                 }
                 if (castlingRights & wq){
                     if (!get_bit(occupancy[both], d1) && !get_bit(occupancy[both], c1) && !get_bit(occupancy[both], b1)){
-                        if(!square_attacked(black, d1) && !square_attacked(black, c1)){
+                        if(!square_attacked(black, d1) && !square_attacked(black, c1) && !square_attacked(black, e1)){
                             add_move(moveList, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
                         }
                     }
@@ -211,7 +227,7 @@ void generate_moves(std::vector<int>& moveList) {
                     // Check so squares are not blocked
                     if (!get_bit(occupancy[both], f8) && !get_bit(occupancy[both], g8)){
                         // Check so squares are not attacked
-                        if (!square_attacked(white, f8) && !square_attacked(white, g8)){
+                        if (!square_attacked(white, f8) && !square_attacked(white, g8) && !square_attacked(white, e8)){
                             // castle king side
                             add_move(moveList, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
                         }
@@ -219,7 +235,7 @@ void generate_moves(std::vector<int>& moveList) {
                 }
                 if (castlingRights & bq){
                     if (!get_bit(occupancy[both], d8) && !get_bit(occupancy[both], c8) && !get_bit(occupancy[both], b8)){
-                        if(!square_attacked(white, d8) && !square_attacked(white, c8)){
+                        if(!square_attacked(white, d8) && !square_attacked(white, c8) && !square_attacked(white, e8)){
                             add_move(moveList, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
                         }
                     }
@@ -474,32 +490,46 @@ int evaluate(){
     return 0;
 }
 
-int negamax(int depth, int alpha, int beta){
-    if (depth == 0){
-        nodes++;
-        return evaluate();
-    }
-    int legal_moves = 0;
-    std::vector<int> moveList;
-    generate_moves(moveList);
+// int negamax(int depth, int alpha, int beta){
+//     if (depth == 0){
+//         nodes++;
+//         return evaluate();
+//     }
+//     int legal_moves = 0;
+//     std::vector<int> moveList;
+//     generate_moves(moveList);
 
-    for( int i = 0; i < moveList.size(); i++){
-        int move = moveList[i];
+//     for( int i = 0; i < moveList.size(); i++){
+//         int move = moveList[i];
+//         save_board();
+//         if (!make_move(move, false))
+//             continue;
+//         int score = -negamax(depth - 1, -beta, -alpha);
+//         restore_board();
+//     }
+//     return 0;
+// }
+
+void generate_legal_moves(std::vector<int>& moveList){
+    std::vector<int> tempList;
+    generate_pseudo_moves(tempList);
+
+    for (int i = 0; i < tempList.size(); i++){
         save_board();
-        if (!make_move(move, false))
+        if (!make_move(tempList[i], false))
             continue;
-        int score = -negamax(depth - 1, -beta, -alpha);
         restore_board();
+        moveList.push_back(tempList[i]);
     }
-
 }
 
-int findMove(int depth){
-    int score = negamax(3, -INFINITY, INFINITY);
-    printf("info score cp %d depth %d nodes %ld\n", score, depth, nodes);
-    std::cout << squareToCoord[get_fromSq(bestMove)] 
-                << squareToCoord[get_toSq(bestMove)]
-                << asciiPieces[get_promotedPiece(bestMove)]
-                << std::endl;
-    return 0;
-}
+
+// int findMove(int depth){
+//     int score = negamax(3, -INFINITY, INFINITY);
+//     printf("info score cp %d depth %d nodes %ld\n", score, depth, nodes);
+//     std::cout << squareToCoord[get_fromSq(bestMove)] 
+//                 << squareToCoord[get_toSq(bestMove)]
+//                 << asciiPieces[get_promotedPiece(bestMove)]
+//                 << std::endl;
+//     return 0;
+// }

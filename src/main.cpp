@@ -15,20 +15,47 @@
 #define POS5 (char*) "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  "
 
 
-u64 perft_nodes;
-void perft_test(int depth){
+int perft_test(int depth){
     if (depth == 0){
-        perft_nodes++;
-        return;
+        return 1;
     }
     std::vector<int> ml;
-    generate_moves(ml);
+    generate_legal_moves(ml);
+    int num_positions = 0;
 
-    for(int i = 0; i < ml.size(); i++){
+    for (int i = 0; i < ml.size(); i++){
         save_board();
         if (!make_move(ml[i], false))
             continue;
-        perft_test(depth-1);
+        num_positions += perft_test(depth-1);
+        // if (depth == 4){
+        //     print_one_move(ml[i]);
+        //     std::cout << " " << num_positions << std::endl;
+        //     num_positions = 0;
+        // }
+        restore_board();
+    }
+    return num_positions;
+}
+
+
+void test(int depth){
+    if (depth == 0){
+        return;
+    }
+    std::vector<int> ml;
+    generate_legal_moves(ml);
+
+    print_board();
+    getchar();
+
+    for (int i = 0; i < ml.size(); i++){
+        save_board();
+        if (!make_move(ml[i], false))
+            continue;
+        print_board();
+        getchar();
+        test(depth-1);
         restore_board();
     }
 }
@@ -36,35 +63,13 @@ void perft_test(int depth){
 
 // https://lichess.org/editor
 // to create custom FEN's
+
 int main(){
     init();
     init_leaper_attacks();
 
     init_slider_attacks(0);
     init_slider_attacks(1);
-
-
-    parse_fen(TRICKY);
-
-    // for(int i = 0; i < 6; i++){
-    //     perft_test(i);
-    //     std::cout << "nodes: " << perft_nodes << std::endl;
-    //     nodes = 0;
-    // }
-
-    std::vector<int> ml;
-    generate_moves(ml);
-
-    for(int i = 0; i < ml.size(); i++){
-        save_board();
-        print_board();
-        if(!make_move(ml[i],false))
-            continue;
-        getchar();
-        print_board();
-        restore_board();
-        getchar();
-    }
 
 
     return 0;

@@ -21,10 +21,10 @@
     side_copy = side, enpas_copy = enPassant, castle_copy = castlingRights;     \
 
     // restore state
-#define restore_board()                                                       \
-    memcpy(bitboards, bb_copy, sizeof(bitboards));                               \
-    memcpy(occupancy, occ_copy, sizeof(occupancy));                          \
-    side = side_copy, enPassant = enpas_copy, castlingRights = castle_copy;           \
+#define restore_board()                                                                 \
+    memcpy(bitboards, bb_copy, sizeof(bitboards));                                      \
+    memcpy(occupancy, occ_copy, sizeof(occupancy));                                     \
+    side = side_copy, enPassant = enpas_copy, castlingRights = castle_copy;             \
 
 #define u64 unsigned long long
 
