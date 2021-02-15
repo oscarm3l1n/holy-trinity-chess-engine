@@ -39,6 +39,7 @@ int get_index(u64 bitboard){
 }
 
 void print_board(){
+    printf("\n\n");
     for (int rank = 0; rank < 8; ++rank) {
         for( int file = 0; file < 8; ++file) {
             int square = 8 * rank + file;

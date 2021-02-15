@@ -64,8 +64,29 @@ int main(){
     init_leaper_attacks();
 
     parse_fen(STARTFEN);
-    print_board();
-    findMove(5);
+
+    while (1){
+        print_board();
+        if (side){
+
+            std::cout << "eval: " << evaluate() << std::endl;
+
+            std::cout << "player move\n > ";
+
+            std::string playerMove;
+            std::cin >> playerMove; 
+
+            int move = make_player_move(playerMove);
+
+            if (move){
+                make_move(move, false);
+            } else {
+                std::cout << "illegal move" << std::endl;
+            }
+        } else {
+            findMove(4);
+        }
+    }
 
     return 0;
 }

@@ -2,11 +2,17 @@
 #include <vector>
 #include "bitboard.h"
 #include "attack.cpp"
-
 #include "uci.cpp"
 #include "init.cpp"
+#include "eval.h"
 
 #include <fstream>
+
+#ifdef WIN64
+    #include <windows.h>
+#else
+    #include <sys/time.h>
+#endif
 
 // store the whole move in an integer i.e. 32 bits
 // 00000000 00000000 00000000 00111111 fromSquare       6 bits
@@ -35,27 +41,7 @@ void add_move(std::vector<int>& moveList, int move){
     moveList.push_back(move);
 }
 
-// #define get_fromSq(move)        (move & 0x3f)
-// #define get_toSq(move)          ((move & 0xfc0) >> 6)
-// #define get_piece(move)         ((move & 0xf000) >> 12)
-// #define get_promotedPiece(move) ((move & 0xf0000) >> 16)
-// #define get_captureFlag(move)   (move & 0x100000)
-// #define get_doubleFlag(move) (move & 0x200000)
-// #define get_enPassantFlag(move) (move & 0x400000)
-// #define get_castlingFlag(move)  (move & 0x800000)
 void print_moves(std::vector<int>& moveList){
-    // std::cout << "move      piece   promot      capt    doubl       EP      castl" << std::endl;
-    // for ( int i = 0; i < moveList.size(); i++){
-    //     int move = moveList[i];
-    //     std::cout << squareToCoord[get_fromSq(move)] <<
-    //                  squareToCoord[get_toSq(move)]   << "       " << 
-    //                  asciiPieces[get_piece(move)]    << "        " <<
-    //                  asciiPieces[get_promotedPiece(move)] <<"         "<<
-    //                  get_captureFlag(move)          << "         " <<
-    //                  get_doubleFlag(move)           << "          " <<
-    //                  get_enPassantFlag(move)        << "          " <<
-    //                  get_castlingFlag(move)         << "          " << std::endl;
-    // }
     for (int i = 0; i < moveList.size(); i++){
 
         int move = moveList[i];
@@ -75,10 +61,6 @@ std::string print_one_move(int move){
     return s;
 }
 
-// start generating all quiet moves
-// which means the moves where no captures
-// are made
-// encode_move (from, to, piece, promPiece, capture, double, EP, castling)
 void generate_pseudo_moves(std::vector<int>& moveList) {
     int fromSq;
     int toSq;
@@ -511,35 +493,149 @@ bool is_check(){
     return false;
 }
 
+// P, B, N, Q, R, K, p, b, n, q, r, k
+int pieceScore[12] = {100, 350, 320, 900, 500, 10000, -100, -350, -320, -900, -500, -10000};
+
 int evaluate(){
     int score = 0;
-    
+    int square;
+    u64 tempBitboard;
     // add up all material
-    score += 100 * (count_bits(bitboards[P]) - count_bits(bitboards[p]));
-    score += 320 * (count_bits(bitboards[N]) - count_bits(bitboards[n]));
-    score += 350 * (count_bits(bitboards[B]) - count_bits(bitboards[b]));
-    score += 500 * (count_bits(bitboards[R]) - count_bits(bitboards[r]));
-    score += 900 * (count_bits(bitboards[Q]) - count_bits(bitboards[q]));
-    score += INFINITY * (count_bits(bitboards[K]) - count_bits(bitboards[k]));
+    for (int piece = P; piece <= k; piece++){
+        tempBitboard = bitboards[piece];
+        while (tempBitboard) {
+            square = get_index(tempBitboard);
+            score += pieceScore[piece];
+            clear_bit(tempBitboard, square);
+        
+            // position bonus
+            switch(piece) {
+                case P: score += pawnTable[square]; break;
+                case B: score += bishopTable[square]; break;
+                case N: score += knightTable[square]; break;
+                case K: score += kingTable[square]; break;
+                case R: score += rookTable[square]; break;
+                // case Q: score += queenTable[square]; break;
 
-    return score;
+                case p: score -= pawnTable[mirrorSquare[square]]; break;
+                case k: score -= kingTable[mirrorSquare[square]]; break;
+                case n: score -= knightTable[mirrorSquare[square]]; break;
+                case b: score -= bishopTable[mirrorSquare[square]]; break;
+                case r: score -= rookTable[mirrorSquare[square]]; break;
+                // case q: score -= queenTable[mirrorSquare[square]]; break;
+            }
+        }
+    }
+    return (side == white) ? score : -score;
 }
 
-
-int bestMove = 0;
-int ply = 0;
 int nodes = 0;
+int ply = 0;
+int bestMove; // will be replaced with PV later on
 
 int negamax(int depth, int alpha, int beta){
-    // TODO
+    if (depth == 0){
+        return evaluate();
+    }
+
+    nodes++;
+
+    // temporary
+    int bestMoveSoFar;
+
+    // temporary
+    int oldAlpha = alpha;
+
+    std::vector<int> moveList;
+    generate_legal_moves(moveList);
+
+    for (int i = 0; i < moveList.size(); i++){
+        save_board();
+        make_move(moveList[i], false);
+
+        ply++;
+
+        int score = -negamax(depth - 1, -beta, -alpha);
+
+        restore_board();
+
+        ply--;
+
+        if (score >= beta)
+            return beta;
+        
+        if (score > alpha) {
+            // PV node
+            alpha = score;
+            if (ply == 0){
+                bestMoveSoFar = moveList[i];
+            }
+        }
+    }
+
+    if (oldAlpha != alpha)
+        bestMove = bestMoveSoFar;
+    return alpha;
 }
 
 void order_moves(std::vector<int> moveList){
     // TODO
 }
 
+int get_time_ms() {
+    #ifdef WIN64
+        return GetTickCount();
+    #else
+        struct timeval time;
+        gettimeofday(&time, NULL);
+        return time.tv_sec * 1000 + time.tv_usec / 1000;
+    #endif
+}
+
 void findMove(int depth){
-    int score = negamax(depth, -INFINITY, INFINITY);
+    int timeStart = get_time_ms();
+
+    negamax(depth, -INFINITY, INFINITY);
     
-    std::cout << "bestmove " << print_one_move(bestMove) << std::endl;
+    make_move(bestMove, false);
+    
+    std::cout << "best move " << print_one_move(bestMove) << std::endl;
+    std::cout << "time: " << get_time_ms() - timeStart << "ms" << std::endl;
+    std::cout << "nodes: " << nodes << std::endl;
+}
+
+int make_player_move(std::string uciMove){
+    std::vector<int> moveList;
+    generate_legal_moves(moveList);
+
+    int fromSq = (uciMove[0] - 'a') + (8 - (uciMove[1] - '0')) * 8;
+    int toSq   = (uciMove[2] - 'a') + (8 - (uciMove[3] - '0')) * 8;
+
+    int promotedPiece = 0;
+
+    for (int i = 0; i < moveList.size(); i++){
+        int move = moveList[i];
+
+        if (fromSq == get_fromSq(move) && toSq == get_toSq(move)){
+
+            promotedPiece = get_promotedPiece(move);
+            if (promotedPiece){
+                if ((promotedPiece == Q || promotedPiece == q) && uciMove[4] == 'q')
+                    return move;
+                else if((promotedPiece == R || promotedPiece == r) && uciMove[4] == 'r')
+                    return move;
+                else if((promotedPiece == N || promotedPiece == n) && uciMove[4] == 'n')
+                    return move;
+                else if((promotedPiece == B || promotedPiece == b) && uciMove[4] == 'b')
+                    return move;
+                else
+                    continue;
+            }
+
+            // legal move
+            return move;
+        }
+    }
+    // illegal move
+    return 0;
 }
