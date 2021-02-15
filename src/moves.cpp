@@ -456,13 +456,17 @@ bool make_move(int move, bool captureMovesOnly){
             return true;
         }
     } else {
-        return false;
+        if (capture){
+            make_move(move, false);
+            return true;
+        }
+        else
+            return false;
     }
 }
 
 // AI
 
-#define INFINITY 50000
 
 
 void generate_legal_moves(std::vector<int>& moveList){
@@ -533,9 +537,43 @@ int nodes = 0;
 int ply = 0;
 int bestMove; // will be replaced with PV later on
 
+int search_all_captures(int alpha, int beta){
+    int value = evaluate();
+
+    if (value >= beta)
+        return beta;
+
+    if (value > alpha)
+        alpha = value;
+    
+    std::vector<int> moveList;
+    generate_legal_moves(moveList);
+
+    for(int i = 0; i < moveList.size(); i++){
+        save_board();
+        ply++;
+        if(!make_move(moveList[i], true)){
+            ply--;
+            continue;
+        }
+
+        int score = -search_all_captures(-beta, -alpha);
+        restore_board();
+        ply--;
+
+        if (score >= beta)
+            return beta;
+
+        if (score > alpha)
+            alpha = score;
+    }
+    return alpha;
+}
+
+
 int negamax(int depth, int alpha, int beta){
     if (depth == 0){
-        return evaluate();
+        return search_all_captures(alpha, beta);
     }
 
     nodes++;
@@ -573,6 +611,15 @@ int negamax(int depth, int alpha, int beta){
         }
     }
 
+    if (moveList.empty()){
+        if (is_check())
+            // the + ply part is to find the closest sequence of moves until checkmate
+            return -MATINGSCORE + ply;
+        else
+            // stalemate
+            return 0;
+    }
+
     if (oldAlpha != alpha)
         bestMove = bestMoveSoFar;
     return alpha;
@@ -599,43 +646,9 @@ void findMove(int depth){
     
     make_move(bestMove, false);
     
-    std::cout << "best move " << print_one_move(bestMove) << std::endl;
+    std::cout << "bestmove " << print_one_move(bestMove) << std::endl;
+    std::cout << "depth: " << depth << std::endl;
     std::cout << "time: " << get_time_ms() - timeStart << "ms" << std::endl;
     std::cout << "nodes: " << nodes << std::endl;
-}
-
-int make_player_move(std::string uciMove){
-    std::vector<int> moveList;
-    generate_legal_moves(moveList);
-
-    int fromSq = (uciMove[0] - 'a') + (8 - (uciMove[1] - '0')) * 8;
-    int toSq   = (uciMove[2] - 'a') + (8 - (uciMove[3] - '0')) * 8;
-
-    int promotedPiece = 0;
-
-    for (int i = 0; i < moveList.size(); i++){
-        int move = moveList[i];
-
-        if (fromSq == get_fromSq(move) && toSq == get_toSq(move)){
-
-            promotedPiece = get_promotedPiece(move);
-            if (promotedPiece){
-                if ((promotedPiece == Q || promotedPiece == q) && uciMove[4] == 'q')
-                    return move;
-                else if((promotedPiece == R || promotedPiece == r) && uciMove[4] == 'r')
-                    return move;
-                else if((promotedPiece == N || promotedPiece == n) && uciMove[4] == 'n')
-                    return move;
-                else if((promotedPiece == B || promotedPiece == b) && uciMove[4] == 'b')
-                    return move;
-                else
-                    continue;
-            }
-
-            // legal move
-            return move;
-        }
-    }
-    // illegal move
-    return 0;
+    printf("\n\n");
 }

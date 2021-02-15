@@ -33,28 +33,146 @@ int perft_test(int depth){
     return num_positions;
 }
 
+int parse_move(std::string uciMove){
+    std::vector<int> moveList;
+    generate_legal_moves(moveList);
 
-void test(int depth){
-    if (depth == 0){
-        return;
+    int fromSq = (uciMove[0] - 'a') + (8 - (uciMove[1] - '0')) * 8;
+    int toSq   = (uciMove[2] - 'a') + (8 - (uciMove[3] - '0')) * 8;
+
+    int promotedPiece = 0;
+
+    for (int i = 0; i < moveList.size(); i++){
+        int move = moveList[i];
+
+        if (fromSq == get_fromSq(move) && toSq == get_toSq(move)){
+
+            promotedPiece = get_promotedPiece(move);
+            if (promotedPiece){
+                if ((promotedPiece == Q || promotedPiece == q) && uciMove[4] == 'q')
+                    return move;
+                else if((promotedPiece == R || promotedPiece == r) && uciMove[4] == 'r')
+                    return move;
+                else if((promotedPiece == N || promotedPiece == n) && uciMove[4] == 'n')
+                    return move;
+                else if((promotedPiece == B || promotedPiece == b) && uciMove[4] == 'b')
+                    return move;
+                else
+                    continue;
+            }
+
+            // legal move
+            return move;
+        }
     }
-    std::vector<int> ml;
-    generate_legal_moves(ml);
-
-    print_board();
-    getchar();
-
-    for (int i = 0; i < ml.size(); i++){
-        save_board();
-        if (!make_move(ml[i], false))
-            continue;
-        print_board();
-        getchar();
-        test(depth-1);
-        restore_board();
-    }
+    // illegal move
+    return 0;
 }
 
+// the position command like in stockfish. for example, to set fen: positin fen *fen string*
+void parse_position(char* command){
+    // skip the "position word" by shifting pointer 9 steps
+    command += 9;
+
+    char *current = command;
+
+    if (strncmp(command, "startpos", 8) == 0){
+        parse_fen(STARTFEN);
+    } else {
+        current = strstr(command, "fen");
+
+        if (current == NULL)
+            parse_fen(STARTFEN);
+        else {
+            current += 4;
+            parse_fen(current);
+        }
+    }
+    current = strstr(command, "moves");
+
+    if (current != NULL) {
+        current += 6;
+
+        while (*current) {
+            int move = parse_move(current);
+
+            if (move == 0)
+                break;
+            
+            make_move(move, false);
+
+            while (*current && *current != ' ') 
+                current++;
+            
+            current++;
+        }
+    }
+
+    print_board();
+}
+
+// "go" command
+void parse_go(char *command){
+    int depth = -1;
+
+    if (strncmp(command, "go depth", 8) == 0){
+        // if command is correct, skip the string part and go to the integer
+        command += 9;
+
+        depth = std::stoi(command);
+        if (depth > 10)
+            depth = 6;
+    }
+    else
+        depth = 6;
+    
+    findMove(depth);
+}
+
+void uci_loop(){
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+
+    char input[2000];
+
+    printf("holy trinity chess engine\n");
+    printf("uciok\n");
+
+    while (1) {
+        memset(input, 0, sizeof(input));
+
+        fflush(stdout);
+
+        if (!fgets(input, 2000, stdin))
+            continue;
+        
+        else if (input[0] == '\n')
+            continue;
+
+        else if (strncmp(input, "isready", 7) == 0) 
+            printf("readyok\n");
+
+        else if (strncmp(input, "position", 8) == 0)
+            parse_position(input);
+        
+        else if (strncmp(input, "ucinewgame", 10) == 0)
+            parse_position((char*)"position startpos");
+        
+        else if (strncmp(input, "go", 2) == 0)
+            parse_go(input);
+        
+        else if (strncmp(input, "quit", 4) == 0)
+            break;
+
+        else if (strncmp(input, "uci", 3) == 0){
+            printf("holy trinity chess engine\n");
+            printf("uciok\n");
+        }
+        else if (strncmp(input, "d", 1) == 0){
+            print_board();
+        }
+    }
+}
 
 // https://lichess.org/editor
 // to create custom FEN's
@@ -68,23 +186,16 @@ int main(){
     while (1){
         print_board();
         if (side){
-
-            std::cout << "eval: " << evaluate() << std::endl;
-
-            std::cout << "player move\n > ";
-
             std::string playerMove;
-            std::cin >> playerMove; 
-
-            int move = make_player_move(playerMove);
-
-            if (move){
+            printf("make move\n > ");
+            std::cin >> playerMove;
+            int move = parse_move(playerMove);
+            if (move)
                 make_move(move, false);
-            } else {
-                std::cout << "illegal move" << std::endl;
-            }
+            else
+                printf("illegal move, try again\n");
         } else {
-            findMove(4);
+            findMove(1);
         }
     }
 

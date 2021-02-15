@@ -1,11 +1,7 @@
 #include <ctype.h>
 #include <cstring>
 #include "bitboard.h"
-// converts following string
-// 1r2r2k/1p1n3R/p1qp2pB/6Pn/P1Pp/3B4/1P2PQ1K/5R2 b - - 0 1
-// to pieces on the board, and sets castling and en passant square
-// and side to play
-// Starting fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -
+
 void parse_fen(char* fen){
 
     memset(bitboards, 0ULL, sizeof(bitboards));
@@ -66,3 +62,4 @@ void parse_fen(char* fen){
     occupancy[both] |= occupancy[white];
     occupancy[both] |= occupancy[black];
 }
+
